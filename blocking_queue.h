@@ -36,6 +36,7 @@ public:
     bool returns(const T &e);         // like put() but insert e to the head of queue.
     bool returnsForcely(const T& e);  // like putForcedly() but insert e to the head of queue.
     T get();
+	bool get(T* val, unsigned long msec);
     T peek();
     void clear();
     bool remove(const T &e);
@@ -202,6 +203,34 @@ T BlockingQueue<T>::get()
     lock.unlock();
     return e;
 }
+
+template <typename T>
+bool BlockingQueue<T>::get(T* val, unsigned long msec)
+{
+	if (!notEmpty.wait(msec))
+	{
+		*val	= nullptr;
+		return false;
+	}
+	bool	res	= lock.tryLockForWrite(msec);
+	if (res == false)
+	{
+		*val	= nullptr;
+		return false;
+	}
+	const T &e = queue.dequeue();
+	if (this->queue.isEmpty())
+	{
+		notEmpty.clear();
+	}
+	if (static_cast<quint32>(queue.size()) < mCapacity)
+	{
+		notFull.set();
+	}
+	*val		= e;
+	lock.unlock();
+    return true;
+};
 
 
 template <typename T>

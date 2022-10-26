@@ -1,6 +1,7 @@
 Qt Blocking Queue
 =================
 
+The fork was created to extend the functionality, now a "get" method with a timeout has been added.
 Passing data through threads is a common task in multi-thread programming. The Qt toolkit does provide a `QQueue` class, and calling slots via `QMetaObject::invokdeMethod(Qt::BlockingQueuedConnection)`. But you might miss the more convenient `BlockingQueue` in Java/Python.
 
 This project implements the `Event` and `BlockingQueue` in two files. You can copy these two files into your projects.

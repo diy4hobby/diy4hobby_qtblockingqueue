@@ -50,11 +50,20 @@ bool EventPrivate::wait(unsigned long time)
     }
 
     incref();
-    mutex.lock();
+    bool	res		= mutex.tryLock(time);
+	if (res == false)	return false;
     Q_ASSERT(!f);
     ++waiters;
-    while (!(f = flag.loadAcquire()) && ref.loadAcquire() > 1) {
-        condition.wait(&mutex);
+    while (!(f = flag.loadAcquire()) && ref.loadAcquire() > 1)
+	{
+		bool	res		= condition.wait(&mutex, time);
+		if (res == false)
+		{
+			--waiters;
+			mutex.unlock();
+			decref();
+			return false;
+		}
     }
     --waiters;
     mutex.unlock();
