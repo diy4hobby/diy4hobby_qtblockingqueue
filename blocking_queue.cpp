@@ -88,9 +88,7 @@ Event::~Event()
 void Event::set()
 {
     if (d) {
-        if (d->flag.fetchAndStoreAcquire(true)) {
-            return;
-        }
+        d->flag.fetchAndStoreAcquire(true);
         d->incref();
         if (d->waiters.loadAcquire() > 0) {
             d->condition.wakeAll();
